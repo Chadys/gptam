@@ -22,7 +22,7 @@ VideoSource::VideoSource()
   std::cout << "  Initiating capture device (whatever it is)..." << std::endl;
 
   
-  pcap = new VideoCapture(-1); // by device number
+  pcap = new cv::VideoCapture(-1); // by device number
   
   
   if(!pcap->isOpened()) {
@@ -32,8 +32,8 @@ VideoSource::VideoSource()
 
   std::cout << "  Now capturing...." << std::endl;
   // obtaining the capture size
-  int width = (int)pcap->get(CV_CAP_PROP_FRAME_WIDTH);
-  int height = (int)pcap->get(CV_CAP_PROP_FRAME_HEIGHT);
+  int width = (int)pcap->get(cv::CV_CAP_PROP_FRAME_WIDTH);
+  int height = (int)pcap->get(cv::CV_CAP_PROP_FRAME_HEIGHT);
   mirSize = cv::Size2i(width, height);
   cout << " Screen size (width , height) : " << width << " , " <<height <<endl;
 };

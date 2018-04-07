@@ -9,8 +9,8 @@
 
 
 #include <cv.hpp>
-#include <highgui.hpp>
-#include <core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/core.hpp>
 #include <cxcore.hpp>
 
 

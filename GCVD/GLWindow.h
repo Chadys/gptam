@@ -9,7 +9,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
-#include <GL/glx.h>
+#include <GL/gl.h>
 
 namespace GLXInterface {
 
@@ -160,7 +160,7 @@ namespace GLXInterface {
       Window window;
       Atom delete_atom;
       Cursor null_cursor;
-      GLXContext context;
+      GLContext context;
     };
 	   
     private:

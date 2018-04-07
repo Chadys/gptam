@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 set(GPTAM_PROJ_NAME gptam)
 set(CALIB_PROJ_NAME gcalibrator)
 
+set(CMAKE_CXX_STANDARD 14)
 
 
 
@@ -14,30 +15,9 @@ list( APPEND CMAKE_MODULE_PATH
 )
 
 ## find openCV
-set( OpenCV_INCLUDE_DIRS
-	"/usr/local/include/opencv"
-	"/usr/local/include/opencv2"
-)
-
-set( OpenCV_LIBS
-	"/usr/local/lib/libopencv_calib3d.so"
-	"/usr/local/lib/libopencv_core.so"
-	"/usr/local/lib/libopencv_features2d.so"
-	"/usr/local/lib/libopencv_flann.so"
-	"/usr/local/lib/libopencv_highgui.so"
-	#"/usr/local/lib/libopencv_imgcodecs.so"
-	"/usr/local/lib/libopencv_imgproc.so"
-	"/usr/local/lib/libopencv_ml.so"
-	"/usr/local/lib/libopencv_objdetect.so"
-	"/usr/local/lib/libopencv_photo.so"
-	#"/usr/local/lib/libopencv_shape.so"
-	"/usr/local/lib/libopencv_stitching.so"
-	"/usr/local/lib/libopencv_superres.so"
-	"/usr/local/lib/libopencv_video.so"
-	#"/usr/local/lib/libopencv_videoio.so"
-	"/usr/local/lib/libopencv_videostab.so"
-	
-)
+set(OpenCV_STATIC ON)
+set(OpenCV_DIR /opt/opencv/build_js)
+find_package(OpenCV REQUIRED)
 
 
 list( APPEND
@@ -48,22 +28,6 @@ list( APPEND
 	EXT_LIBS
 	${OpenCV_LIBS}
 )
-
-
-# George: LAPACK should not be necessary (OpenCV includes it). Just including it here in  comments... 
-#find_package(LAPACK REQUIRED)
-#if(LAPACK_FOUND)
-#set(LAPACKLIBS_FOUND TRUE)
-#list( APPEND
-#	EXT_LINKER_FLAGS
-#	${LAPACK_LINKER_FLAGS}
-#)
-#list( APPEND
-#	EXT_LIBS
-#	${LAPACK_LIBRARIES}
-#	gfortran
-#)
-#endif()
 
 ## find OpenGL
 find_package(OPENGL REQUIRED)
@@ -269,7 +233,7 @@ set(CALIB_PROJ_INCLUDE
 
 # The notorious OpenGL linker flags
 SET( GL_LINKER_FLAGS "-lglut -lGLU -lGL")
-# More linker flags for the pthread (had to look this one up and just copied it)
+# More linker flags for the pthread and math (had to look this one up and just copied it)
 SET( PTHREAD_PROBLEM_LINKER_FLAGS "-lpthread -lm")
 # And another linker flag for the use of readline.h
 SET( GNU_READLINE_LINKER_FLAG "-lreadline")
@@ -313,10 +277,21 @@ target_link_libraries(${GPTAM_PROJ_NAME}
 		      )
 
 ############ DEFINING NECESSARY MACROS (Use_XMMINTRIN=1 for now...) ###############
+set(EMCC_LINKER_FLAGS "--bind -s WASM=1 -O3 -s USE_WEBGL2=1 -s --preload-file shaders")
+set(CMAKE_REQUIRED_FLAGS "${EMCC_LINKER_FLAGS}")
+
 target_compile_definitions(${GPTAM_PROJ_NAME} PRIVATE USE_XMMINTRIN=0)
 remove_definitions(-WIN32)	
 
-set_property(TARGET ${CALIB_PROJ_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS "-D_LINUX -Wall -std=c++14 -march=native ")		      
-set_property(TARGET ${GPTAM_PROJ_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS "-D_LINUX -Wall -std=c++14 -march=native ")  
-install(TARGETS ${GPTAM_PROJ_NAME} RUNTIME DESTINATION ${CMAKE_SOURCE_DIR})
+set_property(TARGET ${CALIB_PROJ_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS "-D_LINUX -Wall")
+set_property(TARGET ${GPTAM_PROJ_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS "-D_LINUX -Wall")
+#install(TARGETS ${GPTAM_PROJ_NAME} RUNTIME DESTINATION ${CMAKE_SOURCE_DIR})
+set_target_properties( ${CALIB_PROJ_NAME} ${GPTAM_PROJ_NAME}
+        PROPERTIES
+        LINK_FLAGS "${EMCC_LINKER_FLAGS}"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
+        )
 
+SET(CMAKE_CACHEFILE_DIR "cmake-build-debug")
