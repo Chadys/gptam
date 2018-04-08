@@ -9,7 +9,8 @@
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
-#include <GL/gl.h>
+//#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
 namespace GLXInterface {
 
@@ -153,14 +154,14 @@ namespace GLXInterface {
 	void make_current() { activate(); }
     
     struct State {
-      cv::Size2i size;
-      cv::Point2i position;
-      std::string title;
-      Display* display;
-      Window window;
-      Atom delete_atom;
-      Cursor null_cursor;
-      GContext context;
+        cv::Size2i size;
+        cv::Point2i position;
+        std::string title;
+        Display* display;
+        Window window;
+        Atom delete_atom;
+        Cursor null_cursor;
+        GLXContext context;
     };
 	   
     private:

@@ -24,17 +24,17 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
 	throw Exceptions::GLWindow::CreationError("Cannot open X display");
 
     int visualAttributes[] = {
-	GLX_RGBA,
-	GLX_DOUBLEBUFFER,
-	GLX_RED_SIZE,      bpp/3,
-	GLX_GREEN_SIZE,    bpp/3,
-	GLX_BLUE_SIZE,     bpp/3,
-	GLX_DEPTH_SIZE,    8,
-	GLX_STENCIL_SIZE, 8,
-	None
+		GLX_RGBA,
+		GLX_DOUBLEBUFFER,
+		GLX_RED_SIZE,      bpp/3,
+		GLX_GREEN_SIZE,    bpp/3,
+		GLX_BLUE_SIZE,     bpp/3,
+		GLX_DEPTH_SIZE,    8,
+		GLX_STENCIL_SIZE, 8,
+		None
     };
     XVisualInfo* visualInfo = glXChooseVisual(display, DefaultScreen(display),visualAttributes);
-    if(visualAttributes == 0) {
+    if(visualAttributes == nullptr) {
 	XCloseDisplay(display);
 	throw Exceptions::GLWindow::CreationError("glXChooseVisual failed");
     }
@@ -72,7 +72,7 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
     Atom delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", True);
     XSetWMProtocols(display, window, &delete_atom, 1);
 
-    GContext context = glXCreateContext(display, visualInfo, 0, True);
+	GLXContext context = glXCreateContext(display, visualInfo, 0, True);
     if (context == 0) {
 	XDestroyWindow(display, window);
 	XCloseDisplay(display);

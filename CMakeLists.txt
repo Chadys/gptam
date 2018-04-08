@@ -277,7 +277,7 @@ target_link_libraries(${GPTAM_PROJ_NAME}
 		      )
 
 ############ DEFINING NECESSARY MACROS (Use_XMMINTRIN=1 for now...) ###############
-set(EMCC_LINKER_FLAGS "--bind -s WASM=1 -O3 -s USE_WEBGL2=1 -s --preload-file shaders")
+set(EMCC_LINKER_FLAGS "--bind -s WASM=1 -O3 -s USE_WEBGL2=1 -s GL_STATE_CACHE=1 -s USE_GLFW=3")
 set(CMAKE_REQUIRED_FLAGS "${EMCC_LINKER_FLAGS}")
 
 target_compile_definitions(${GPTAM_PROJ_NAME} PRIVATE USE_XMMINTRIN=0)
