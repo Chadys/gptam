@@ -34,7 +34,7 @@ System::System() : mGLWindow(mVideoSource.getSize(), "PTAM")
   cv::Vec<float, NUMTRACKERCAMPARAMETERS> vTest = PV3::get<cv::Vec<float, NUMTRACKERCAMPARAMETERS> >("Camera.Parameters", ATANCamera::mvDefaultParams, HIDDEN);
   mpCamera = new ATANCamera("Camera");
   cv::Vec2f v2(0 , 0);
-  if(v2==v2) ;
+
   if(vTest == ATANCamera::mvDefaultParams) {
       cout << endl;
       cout << "! Camera.Parameters is not set, need to run the CameraCalibrator tool" << endl;

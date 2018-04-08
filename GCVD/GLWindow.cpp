@@ -72,7 +72,7 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
     Atom delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", True);
     XSetWMProtocols(display, window, &delete_atom, 1);
 
-    GLXContext context = glXCreateContext(display, visualInfo, 0, True);
+    GContext context = glXCreateContext(display, visualInfo, 0, True);
     if (context == 0) {
 	XDestroyWindow(display, window);
 	XCloseDisplay(display);

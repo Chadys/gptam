@@ -1,6 +1,6 @@
 // Font header file
-#ifndef serif_FONT_HEADER
-#define serif_FONT_HEADER
+#ifndef serif_FONT_H
+#define serif_FONT_H
 
 #include "FontStructs.h"
 

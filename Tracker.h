@@ -21,7 +21,7 @@
 #include <list>
 
 
-class TrackerData;
+struct TrackerData;
 
 struct Trail    // This struct is used for initial correspondences of the first stereo pair.
 {

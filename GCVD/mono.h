@@ -1,7 +1,7 @@
 
 // Font header file
-#ifndef MONO_FONT_HEADER
-#define MONO_FONT_HEADER
+#ifndef MONO_FONT_HEADER_H
+#define MONO_FONT_HEADER_H
 
 #include "FontStructs.h"
 

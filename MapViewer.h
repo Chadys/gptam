@@ -23,7 +23,7 @@
 
 using namespace RigidTransforms;
 
-class Map;
+struct Map;
 
 
 class MapViewer {

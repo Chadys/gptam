@@ -1,6 +1,6 @@
 // Font header file
-#ifndef sans_FONT_HEADER
-#define sans_FONT_HEADER
+#ifndef sans_FONT_H
+#define sans_FONT_H
 
 #include "FontStructs.h"
 

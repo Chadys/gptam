@@ -18,7 +18,7 @@
 #include "OpenCV.h"
 
 class ATANCamera;
-class Map;
+struct Map;
 class MapMaker;
 class Tracker;
 class ARDriver;

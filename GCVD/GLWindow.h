@@ -160,7 +160,7 @@ namespace GLXInterface {
       Window window;
       Atom delete_atom;
       Cursor null_cursor;
-      GLContext context;
+      GContext context;
     };
 	   
     private:

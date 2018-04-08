@@ -1,9 +1,12 @@
 // -*- c++ *--
 // Copyright 2008 Isis Innovation Limited
 //
+#ifndef __VIDEOSOURCE_H
+#define __VIDEOSOURCE_H
+
 // VideoSource.h
 // Declares the VideoSource class
-// 
+//
 // This is a very simple class to provide video input; this can be
 // replaced with whatever form of video input that is needed.  It
 // should open the video input on construction, and provide two
@@ -13,6 +16,7 @@
 // GreyScale and Colour versions of the new frame.
 
 #include "OpenCV.h"
+#include <opencv2/videoio.hpp>
 
 using namespace cv;
 
@@ -32,3 +36,5 @@ class VideoSource
   
   cv::Size2i mirSize;
 };
+
+#endif

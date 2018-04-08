@@ -143,7 +143,7 @@ class Builder:
                "-DBUILD_opencv_photo=ON", #changed
                "-DBUILD_opencv_imgcodecs=ON", #changed
                "-DBUILD_opencv_shape=OFF",
-               "-DBUILD_opencv_videoio=OFF",
+               "-DBUILD_opencv_videoio=ON", #changed
                "-DBUILD_opencv_videostab=OFF",
                "-DBUILD_opencv_highgui=ON", #changed
                "-DBUILD_opencv_superres=OFF",
