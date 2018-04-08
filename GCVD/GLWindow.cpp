@@ -16,58 +16,35 @@ GLXInterface::Exceptions::GLWindow::RuntimeError::RuntimeError(std::string w)
 }
 
 
+GLXInterface::GLWindow::GLWindow(const cv::Size2i& size, const std::string& title, int bpp){
+	init(size, bpp, title);
+}
 
-void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::string& title, const std::string& disp)
+void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::string& title)
 {
-    Display* display = XOpenDisplay(disp == "" ? NULL : const_cast<char*>(disp.c_str()));
-    if (display == 0)
-	throw Exceptions::GLWindow::CreationError("Cannot open X display");
+	if (!glfwInit())
+	{
+		throw Exceptions::GLWindow::CreationError("Cannot init GLFW");
+	}
+	GLFWwindow* window = glfwCreateWindow(size.width, size.height, title.c_str(), glfwGetPrimaryMonitor(), NULL);
+	if (!window)
+	{
+		throw Exceptions::GLWindow::CreationError("Window couldn't be created");
+	}
 
-    int visualAttributes[] = {
-		GLX_RGBA,
-		GLX_DOUBLEBUFFER,
-		GLX_RED_SIZE,      bpp/3,
-		GLX_GREEN_SIZE,    bpp/3,
-		GLX_BLUE_SIZE,     bpp/3,
-		GLX_DEPTH_SIZE,    8,
-		GLX_STENCIL_SIZE, 8,
-		None
-    };
-    XVisualInfo* visualInfo = glXChooseVisual(display, DefaultScreen(display),visualAttributes);
-    if(visualAttributes == nullptr) {
-	XCloseDisplay(display);
-	throw Exceptions::GLWindow::CreationError("glXChooseVisual failed");
-    }
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+	glfwWindowHint(GLFW_RED_BITS, bpp/3);
+	glfwWindowHint(GLFW_GREEN_BITS, bpp/3);
+	glfwWindowHint(GLFW_BLUE_BITS, bpp/3);
+	glfwWindowHint(GLFW_ALPHA_BITS, bpp/3);
+	glfwWindowHint(GLFW_DEPTH_BITS, 8);
+	glfwWindowHint(GLFW_STENCIL_BITS, 8);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
 
-    Window rootWindow = RootWindow(display, visualInfo->screen);
-    XWindowAttributes windowAttributes;
+	glfwMakeContextCurrent(window);
 
-    XGetWindowAttributes(display, rootWindow, &windowAttributes);
-
-    XSetWindowAttributes attributes;
-    attributes.border_pixel = 0;
-    attributes.colormap = XCreateColormap(display, rootWindow, visualInfo->visual, AllocNone);
-    attributes.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | StructureNotifyMask | ExposureMask;
-
-    Window window = XCreateWindow(display,
-				  rootWindow,
-				  0, 0, size.width, size.height,
-				  0, visualInfo->depth,
-				  InputOutput,
-				  visualInfo->visual,
-				  CWBorderPixel | CWColormap | CWEventMask,
-				  &attributes);
-    XStoreName(display, window, title.c_str());
-    XClassHint classHint;
-	char res_name[] = "cvd";
-    classHint.res_class = res_name;
-    classHint.res_name = (char *)title.c_str();
-    XSetClassHint(display, window, &classHint);
-    XMapWindow(display, window);
-    XEvent ev;
-    do {
-        XNextEvent(display,&ev);
-    } while (ev.type != MapNotify);
+    char res_name[] = "cvd";
 
     Atom delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", True);
     XSetWMProtocols(display, window, &delete_atom, 1);
@@ -111,12 +88,8 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
 
 GLXInterface::GLWindow::~GLWindow()
 {
-    glXMakeCurrent(state->display, None, 0);
-    glXDestroyContext(state->display, state->context);
-
-    XUnmapWindow(state->display, state->window);
-    XDestroyWindow(state->display, state->window);
-    XCloseDisplay(state->display);
+	glfwTerminate();
+	glfwDestroyWindow(state.window);
     delete state;
 }
 

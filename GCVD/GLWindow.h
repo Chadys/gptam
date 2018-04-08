@@ -113,9 +113,7 @@ namespace GLXInterface {
 	  init(size, bpp, title, display);
 	}
 	///@overload
-	GLWindow(const cv::Size2i& size, const std::string& title, int bpp=24, const std::string& display="") {
-	  init(size, bpp, title, display);
-	}
+	GLWindow(const cv::Size2i& size, const std::string& title, int bpp=24);
 
 	~GLWindow();
 	/// Get the size
@@ -157,16 +155,14 @@ namespace GLXInterface {
         cv::Size2i size;
         cv::Point2i position;
         std::string title;
-        Display* display;
-        Window window;
+        GLFWwindow* window;
         Atom delete_atom;
         Cursor null_cursor;
-        GLXContext context;
     };
 	   
     private:
 	State* state;
-	void init(const cv::Size2i& sz, int bpp, const std::string& title, const std::string& display);
+	void init(const cv::Size2i& sz, int bpp, const std::string& title);
     
 	
     };
