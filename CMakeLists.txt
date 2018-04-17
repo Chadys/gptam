@@ -231,12 +231,13 @@ set(CALIB_PROJ_INCLUDE
 
 
 
-# The notorious OpenGL linker flags
-SET( GL_LINKER_FLAGS "-lglut -lGLU -lGL")
-# More linker flags for the pthread and math (had to look this one up and just copied it)
-SET( PTHREAD_PROBLEM_LINKER_FLAGS "-lpthread -lm")
-# And another linker flag for the use of readline.h
-SET( GNU_READLINE_LINKER_FLAG "-lreadline")
+## The notorious OpenGL linker flags
+#SET( GL_LINKER_FLAGS "-lglut -lGLU -lGL")
+## More linker flags for the pthread and math (had to look this one up and just copied it)
+#SET( PTHREAD_PROBLEM_LINKER_FLAGS "-lpthread -lm")
+## And another linker flag for the use of readline.h
+#SET( GNU_READLINE_LINKER_FLAG "-lreadline")
+# REplaced by emscripten options
 
 # declaring external library include directories
 include_directories(${EXT_INCLUDE_DIRS})
@@ -251,9 +252,9 @@ add_executable(${CALIB_PROJ_NAME}
               
 target_link_libraries(${CALIB_PROJ_NAME}
 		      ${EXT_LIBS}
-		      ${GL_LINKER_FLAGS}
-		      ${PTHREAD_PROBLEM_LINKER_FLAGS}
-		      ${GNU_READLINE_LINKER_FLAG}
+#		      ${GL_LINKER_FLAGS}
+#		      ${PTHREAD_PROBLEM_LINKER_FLAGS}
+#		      ${GNU_READLINE_LINKER_FLAG}
 		      )
 
         
@@ -271,13 +272,13 @@ add_executable(${GPTAM_PROJ_NAME}
 
 target_link_libraries(${GPTAM_PROJ_NAME}
 		      ${EXT_LIBS}
-		      ${GL_LINKER_FLAGS}
-		      ${PTHREAD_PROBLEM_LINKER_FLAGS}
-		      ${GNU_READLINE_LINKER_FLAG}
+#		      ${GL_LINKER_FLAGS}
+#		      ${PTHREAD_PROBLEM_LINKER_FLAGS}
+#		      ${GNU_READLINE_LINKER_FLAG}
 		      )
 
 ############ DEFINING NECESSARY MACROS (Use_XMMINTRIN=1 for now...) ###############
-set(EMCC_LINKER_FLAGS "--bind -s WASM=1 -O3 -s USE_WEBGL2=1 -s GL_STATE_CACHE=1 -s USE_GLFW=3")
+set(EMCC_LINKER_FLAGS "--bind -s WASM=1 -O3 -s USE_WEBGL2=1 -s GL_STATE_CACHE=1 -s USE_GLFW=3 -s USE_PTHREADS=1")
 set(CMAKE_REQUIRED_FLAGS "${EMCC_LINKER_FLAGS}")
 
 target_compile_definitions(${GPTAM_PROJ_NAME} PRIVATE USE_XMMINTRIN=0)

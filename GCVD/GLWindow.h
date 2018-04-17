@@ -109,9 +109,8 @@ namespace GLXInterface {
 	/// @param bpp     Colour depth
 	/// @param title   Window title
 	/// @param display X11 display string, passed to XOpenDisplay. "" Is used to indicate NULL. This is ignored for non X11 platforms. 
-	GLWindow(const cv::Size2i& size, int bpp=24, const std::string& title="GLWindow", const std::string& display="") {
-	  init(size, bpp, title, display);
-	}
+	GLWindow(const cv::Size2i& size, int bpp=24, const std::string& title="GLWindow");
+
 	///@overload
 	GLWindow(const cv::Size2i& size, const std::string& title, int bpp=24);
 
@@ -134,8 +133,6 @@ namespace GLXInterface {
 	void hide_cursor() { show_cursor(false); }
 	/// Get the title
 	std::string title() const;
-	/// Set the title
-	void set_title(const std::string& title);
 	/// Swap the front and back buffers
 	void swap_buffers();
 	/// Handle events in the event queue by calling back to the specified handler.

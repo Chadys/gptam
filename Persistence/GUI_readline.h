@@ -3,7 +3,7 @@
 
 #include <string>
 
-// This file is small, but due to static emmebrs, requires a .cpp, hence the GUI_readline.cpp
+// This file is small, but due to static members, requires a .cpp, hence the GUI_readline.cpp
 namespace Persistence
 {
 

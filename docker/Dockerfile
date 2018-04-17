@@ -15,5 +15,15 @@ RUN mkdir /opt/opencv && cd /opt/opencv\
 COPY ./build_js.py /opt/opencv/opencv-3.4.1/platforms/js/build_js.py
 RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
         && python /opt/opencv/opencv-3.4.1/platforms/js/build_js.py /opt/opencv/build_js --build_wasm"]
+
+RUN mkdir /opt/readline && cd /opt/readline\
+    && wget 'http://ftp.gnu.org/gnu/readline/readline-6.3.tar.gz' -O readline-6.3.tar.gz \
+    && tar -xzf readline-6.3.tar.gz \
+    && rm readline-6.3.tar.gz
+RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
+        && cd /opt/readline/readline-6.3\
+        && export bash_cv_signal_vintage=posix\
+        && $EMSCRIPTEN/emconfigure ./configure --disable-shared\
+        && $EMSCRIPTEN/emmake make"]
 WORKDIR /opt/code/
 EXPOSE 8080

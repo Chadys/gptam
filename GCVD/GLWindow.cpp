@@ -20,6 +20,10 @@ GLXInterface::GLWindow::GLWindow(const cv::Size2i& size, const std::string& titl
 	init(size, bpp, title);
 }
 
+GLXInterface::GLWindow::GLWindow(const cv::Size2i& size, int bpp=24, const std::string& title="GLWindow"){
+	init(size, bpp, title);
+}
+
 void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::string& title)
 {
 	if (!glfwInit())
@@ -44,24 +48,6 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
 
 	glfwMakeContextCurrent(window);
 
-    char res_name[] = "cvd";
-
-    Atom delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", True);
-    XSetWMProtocols(display, window, &delete_atom, 1);
-
-	GLXContext context = glXCreateContext(display, visualInfo, 0, True);
-    if (context == 0) {
-	XDestroyWindow(display, window);
-	XCloseDisplay(display);
-	throw Exceptions::GLWindow::CreationError("glXCreateContext failed");
-    }
-
-    if (glXMakeCurrent(display, window, context) == False) {
-	glXDestroyContext(display, context);
-	XDestroyWindow(display, window);
-	XCloseDisplay(display);
-	throw Exceptions::GLWindow::CreationError("glXMakeCurrent failed");
-    }
     glLoadIdentity();
     glViewport(0, 0, size.width, size.height);
     glMatrixMode(GL_PROJECTION);
@@ -79,11 +65,9 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
     state = new State();
     state->size = size;
     state->title = title;
-    state->display = display;
     state->window = window;
     state->delete_atom = delete_atom;
     state->null_cursor = null_cursor;
-    state->context = context;
 }
 
 GLXInterface::GLWindow::~GLWindow()
@@ -136,12 +120,6 @@ void GLXInterface::GLWindow::show_cursor(bool show)
 std::string GLXInterface::GLWindow::title() const
 {
     return state->title;
-}
-
-void GLXInterface::GLWindow::set_title(const std::string& title)
-{
-    state->title = title;
-    XStoreName(state->display, state->window, title.c_str());
 }
 
 void GLXInterface::GLWindow::swap_buffers()
