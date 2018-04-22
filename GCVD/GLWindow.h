@@ -47,11 +47,6 @@ namespace GLXInterface {
     class GLWindow {
    
 	public:
-  
-	/// Symbols for mouse buttons and modifiers
-	enum MouseButton { BUTTON_LEFT=1, BUTTON_MIDDLE=2, BUTTON_RIGHT=4, BUTTON_MOD_CTRL=8, BUTTON_MOD_SHIFT=0x10, BUTTON_WHEEL_UP=0x20, BUTTON_WHEEL_DOWN=0x40 };
-	/// Symbols for window events
-	enum EventType { EVENT_CLOSE, EVENT_EXPOSE };
 
 	/// Abstract base class for event handlers.  Subclass this and override to implement a handler.
 	class EventHandler {
@@ -73,14 +68,6 @@ namespace GLXInterface {
 	    virtual void on_event(GLWindow& /*win*/, int /*event*/) {}
 	};
 
-	struct Event {
-	    enum Type { KEY_DOWN, KEY_UP, MOUSE_MOVE, MOUSE_DOWN, MOUSE_UP, RESIZE, EVENT };
-	    Type type;
-	    int which, state;
-	    cv::Point2i where;
-	    cv::Size2i size;
-	};
-
 	/// A summary of multiple events
 	struct EventSummary {
 	    
@@ -95,8 +82,6 @@ namespace GLXInterface {
 	    std::map<int,int> events;
 	    /// Reset the summary
 	    void clear() { *this = EventSummary(); }
-	    /// Has escape been pressed or the close button pressed?
-	    bool should_quit() const;
 	    /// last seen cursor position from mouse_move
 	    cv::Point2i cursor;
 	    /// was the cursor moved during the recording of the history
@@ -109,10 +94,10 @@ namespace GLXInterface {
 	/// @param bpp     Colour depth
 	/// @param title   Window title
 	/// @param display X11 display string, passed to XOpenDisplay. "" Is used to indicate NULL. This is ignored for non X11 platforms. 
-	GLWindow(const cv::Size2i& size, int bpp=24, const std::string& title="GLWindow");
+	GLWindow(const cv::Size2i& size, EventHandler& handler = MakeSummary(), int bpp=24, const std::string& title="GLWindow");
 
 	///@overload
-	GLWindow(const cv::Size2i& size, const std::string& title, int bpp=24);
+	GLWindow(const cv::Size2i& size, const std::string& title, EventHandler& handler = MakeSummary(), int bpp=24);
 
 	~GLWindow();
 	/// Get the size
@@ -135,26 +120,24 @@ namespace GLXInterface {
 	std::string title() const;
 	/// Swap the front and back buffers
 	void swap_buffers();
+	/// register event handlers
+	void set_events(EventHandler& handler);
 	/// Handle events in the event queue by calling back to the specified handler.
-	void handle_events(EventHandler& handler);
-	/// Store all events in the event queue into Event objects.
-	void get_events(std::vector<Event>& events);
-	/// Make a summary of the events in the queue.
-	void get_events(EventSummary& summary);
-	/// @returns true if events are pending
-	bool has_events() const;
+	void handle_events();
 	/// Make this GL context active
 	void activate();
 	/// Make this GL context active
 	void make_current() { activate(); }
+
+	/// events handler
+	void error_callback(int error, const char* description);
+	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+	static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
     
     struct State {
-        cv::Size2i size;
-        cv::Point2i position;
         std::string title;
         GLFWwindow* window;
-        Atom delete_atom;
-        Cursor null_cursor;
     };
 	   
     private:

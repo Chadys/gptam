@@ -21,7 +21,7 @@ using namespace Persistence;
 #include <GL/gl.h>
 #include <GL/glut.h>
 
-GLWindow2::GLWindow2(cv::Size2i irSize, string sTitle) : GLWindow(irSize, sTitle)
+GLWindow2::GLWindow2(cv::Size2i irSize, string sTitle) : GLWindow(irSize, sTitle, *this)
 {
 
 #ifdef WIN32
