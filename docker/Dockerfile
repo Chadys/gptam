@@ -23,7 +23,10 @@ RUN mkdir /opt/readline && cd /opt/readline\
 RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
         && cd /opt/readline/readline-6.3\
         && export bash_cv_signal_vintage=posix\
+        && export ac_cv_lib_util_openpty=no\
+        && export ac_cv_lib_dir_opendir=no\
         && $EMSCRIPTEN/emconfigure ./configure --disable-shared\
-        && $EMSCRIPTEN/emmake make"]
+        && $EMSCRIPTEN/emmake make\
+        && $EMSCRIPTEN/emmake make install"]
 WORKDIR /opt/code/
 EXPOSE 8080

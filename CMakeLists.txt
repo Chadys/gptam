@@ -14,11 +14,11 @@ list( APPEND CMAKE_MODULE_PATH
   ${EXT_DIR}
 )
 
+
 ## find openCV
 set(OpenCV_STATIC ON)
 set(OpenCV_DIR /opt/opencv/build_js)
 find_package(OpenCV REQUIRED)
-
 
 list( APPEND
 	EXT_INCLUDE_DIRS
@@ -28,6 +28,7 @@ list( APPEND
 	EXT_LIBS
 	${OpenCV_LIBS}
 )
+
 
 ## find OpenGL
 find_package(OPENGL REQUIRED)
@@ -40,11 +41,22 @@ list( APPEND
 	${OPENGL_LIBRARIES}
 )
 
+
+## find Readline
+list( APPEND
+        EXT_INCLUDE_DIRS
+        /usr/local/include
+        )
+list( APPEND
+        EXT_LIBS
+        /usr/local/lib
+        )
+
 ########## 1. GPTAM SOURCE FILES  ###################
 
 set(GPTAM_PROJ_SOURCE
-        ${CMAKE_SOURCE_DIR}/main.cpp
-        ${CMAKE_SOURCE_DIR}/ARDriver.cpp
+	${CMAKE_SOURCE_DIR}/main.cpp
+	${CMAKE_SOURCE_DIR}/ARDriver.cpp
 	${CMAKE_SOURCE_DIR}/System.cpp
 	${CMAKE_SOURCE_DIR}/KeyFrame.cpp
 	${CMAKE_SOURCE_DIR}/MapPoint.cpp
@@ -237,7 +249,7 @@ set(CALIB_PROJ_INCLUDE
 #SET( PTHREAD_PROBLEM_LINKER_FLAGS "-lpthread -lm")
 ## And another linker flag for the use of readline.h
 #SET( GNU_READLINE_LINKER_FLAG "-lreadline")
-# REplaced by emscripten options
+# Replaced by emscripten options
 
 # declaring external library include directories
 include_directories(${EXT_INCLUDE_DIRS})
@@ -254,11 +266,11 @@ target_link_libraries(${CALIB_PROJ_NAME}
 		      ${EXT_LIBS}
 #		      ${GL_LINKER_FLAGS}
 #		      ${PTHREAD_PROBLEM_LINKER_FLAGS}
-#		      ${GNU_READLINE_LINKER_FLAG}
+		      ${GNU_READLINE_LINKER_FLAG}
 		      )
 
         
-install(TARGETS ${CALIB_PROJ_NAME} RUNTIME DESTINATION ${CMAKE_SOURCE_DIR})
+#install(TARGETS ${CALIB_PROJ_NAME} RUNTIME DESTINATION ${CMAKE_SOURCE_DIR})
 
       
 		      
@@ -274,7 +286,7 @@ target_link_libraries(${GPTAM_PROJ_NAME}
 		      ${EXT_LIBS}
 #		      ${GL_LINKER_FLAGS}
 #		      ${PTHREAD_PROBLEM_LINKER_FLAGS}
-#		      ${GNU_READLINE_LINKER_FLAG}
+		      ${GNU_READLINE_LINKER_FLAG}
 		      )
 
 ############ DEFINING NECESSARY MACROS (Use_XMMINTRIN=1 for now...) ###############
