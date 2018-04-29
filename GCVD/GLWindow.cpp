@@ -13,15 +13,21 @@ GLXInterface::Exceptions::GLWindow::RuntimeError::RuntimeError(std::string w)
     //what() = "GLWindow error: " + w;
 }
 
-GLXInterface::GLWindow::GLWindow(const cv::Size2i& size, const std::string& title, EventHandler& handler, int bpp){
-	init(size, bpp, title, handler);
+GLXInterface::GLWindow::GLWindow(const cv::Size2i& size, const std::string& title, GLFWmousebuttonfun mouse_button_callback,
+                                 GLFWcursorposfun cursor_position_callback, GLFWkeyfun key_callback, GLFWscrollfun scroll_callback,
+                                 GLFWwindowclosefun close_callback, GLFWwindowsizefun size_callback, int bpp){
+	init(size, bpp, title, mouse_button_callback, cursor_position_callback, key_callback, scroll_callback, close_callback, size_callback);
 }
 
-GLXInterface::GLWindow::GLWindow(const cv::Size2i& size, EventHandler& handler, int bpp, const std::string& title){
-	init(size, bpp, title, handler);
+GLXInterface::GLWindow::GLWindow(const cv::Size2i& size, GLFWmousebuttonfun mouse_button_callback,
+              GLFWcursorposfun cursor_position_callback, GLFWkeyfun key_callback, GLFWscrollfun scroll_callback,
+              GLFWwindowclosefun close_callback, GLFWwindowsizefun size_callback, int bpp, const std::string& title){
+	init(size, bpp, title, mouse_button_callback, cursor_position_callback, key_callback, scroll_callback, close_callback, size_callback);
 }
 
-void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::string& title, EventHandler& handler)
+void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::string& title, GLFWmousebuttonfun mouse_button_callback,
+                                  GLFWcursorposfun cursor_position_callback, GLFWkeyfun key_callback, GLFWscrollfun scroll_callback,
+                                  GLFWwindowclosefun close_callback, GLFWwindowsizefun size_callback)
 {
     glfwSetErrorCallback(error_callback);
 	if (!glfwInit())
@@ -34,7 +40,7 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
 		throw Exceptions::GLWindow::CreationError("Window couldn't be created");
 	}
 
-    set_events(handler);
+    set_events(mouse_button_callback, cursor_position_callback, key_callback, scroll_callback, close_callback, size_callback);
 
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_RED_BITS, bpp/3);
@@ -49,7 +55,6 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
 	glfwMakeContextCurrent(window);
 
     glLoadIdentity();
-    glfwGetFramebufferSize(window, &size.width, &size.height);
     glViewport(0, 0, size.width, size.height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -66,7 +71,7 @@ void GLXInterface::GLWindow::init(const cv::Size2i& size, int bpp, const std::st
 GLXInterface::GLWindow::~GLWindow()
 {
 	glfwTerminate();
-	glfwDestroyWindow(state.window);
+	glfwDestroyWindow(state->window);
     delete state;
 }
 
@@ -87,8 +92,6 @@ cv::Point2i GLXInterface::GLWindow::position() const {
 }
 
 void GLXInterface::GLWindow::set_position(const cv::Point2i &p_){
-    
-    state->position = p_;
 	glfwSetWindowPos(state->window, p_.x, p_.y);
 }
 
@@ -99,9 +102,9 @@ void GLXInterface::GLWindow::set_cursor_position(const cv::Point2i &where)
 
 cv::Point2i GLXInterface::GLWindow::cursor_position() const
 {
-    cv::Point2i where;
-    glfwGetCursorPos(state->window, &where.x, &where.y);
-    return where;
+    double x, y;
+    glfwGetCursorPos(state->window, &x, &y);
+    return cv::Point2i((int)x, (int)y);
 }
 
 void GLXInterface::GLWindow::show_cursor(bool show)
@@ -127,72 +130,15 @@ void GLXInterface::GLWindow::error_callback(int error, const char* description)
     fprintf(stderr, "Error: %s\n", description);
 }
 
-
-void GLXInterface::GLWindow::mouse_button_callback(GLFWwindow* window, int button, int action, int mods){
-    //TODO
-}
-
-static void GLXInterface::GLWindow::cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
-    //TODO
-}
-
-void GLXInterface::GLWindow::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
-    //TODO
-}
-
-void GLXInterface::GLWindow::set_events(EventHandler& handler){
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
-    glfwSetKeyCallback(window, key_callback);
-
-//	switch (event.type) {
-//	case ButtonPress:
-//	    handler.on_mouse_down(*this, cv::Point2i(event.xbutton.x, event.xbutton.y),
-//				  convertButtonState(event.xbutton.state), convertButton(event.xbutton.button));
-//	    break;
-//	case ButtonRelease:
-//	    handler.on_mouse_up(*this, cv::Point2i(event.xbutton.x, event.xbutton.y),
-//				convertButtonState(event.xbutton.state), convertButton(event.xbutton.button));
-//	    break;
-//	case MotionNotify:
-//	    handler.on_mouse_move(*this, cv::Point2i(event.xmotion.x, event.xmotion.y), convertButtonState(event.xbutton.state));
-//	    break;
-//	case KeyPress:
-//		{
-//		XLookupString(&event.xkey, 0, 0, &k, 0);
-//	    handler.on_key_down(*this, k);
-//	    break;
-//		}
-//	case KeyRelease:
-//		XLookupString(&event.xkey, 0, 0, &k, 0);
-//	    handler.on_key_up(*this, k);
-//	    break;
-//	    //case UnmapNotify: active = 0; break;
-//	    //case MapNotify: active = 1; break;
-//	case ConfigureNotify:
-//	    if (event.xconfigure.width != state->size.width || event.xconfigure.height != state->size.height) {
-//		activate();
-//		state->size = cv::Size2i(event.xconfigure.width, event.xconfigure.height);
-//		glViewport(0, 0, state->size.width, state->size.height);
-//		//glRasterPos2f(0,0);
-//		//glPixelZoom(float(event.xconfigure.width)/myWidth,-float(event.xconfigure.height)/myHeight);
-//		handler.on_resize(*this, state->size);
-//	    }
-//	    break;
-//	case Expose:
-//		handler.on_event(*this, EVENT_EXPOSE);
-//		break;
-//	case ClientMessage:
-//	    if (event.xclient.data.l[0] == (int)state->delete_atom)
-//		handler.on_event(*this, EVENT_CLOSE);
-//	    else
-//		handler.on_event(*this, event.xclient.message_type);
-//	    break;
-//	default:
-//	    handler.on_event(*this, event.type);
-//	    break;
-//	}
-//    }
+void GLXInterface::GLWindow::set_events(GLFWmousebuttonfun mouse_button_callback, GLFWcursorposfun cursor_position_callback,
+                                        GLFWkeyfun key_callback, GLFWscrollfun scroll_callback,
+                                        GLFWwindowclosefun close_callback, GLFWwindowsizefun size_callback){
+    glfwSetMouseButtonCallback(state->window, mouse_button_callback);
+    glfwSetCursorPosCallback(state->window, cursor_position_callback);
+    glfwSetKeyCallback(state->window, key_callback);
+    glfwSetScrollCallback(state->window, scroll_callback);
+    glfwSetWindowCloseCallback(state->window, close_callback);
+    glfwSetWindowSizeCallback(state->window, size_callback);
 }
 
 void GLXInterface::GLWindow::handle_events()
@@ -200,20 +146,35 @@ void GLXInterface::GLWindow::handle_events()
     glfwPollEvents();
 }
 
+void GLXInterface::GLWindow::MakeSummary::mouse_button_callback(GLFWwindow* window, int button, int action, int mods){
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+    cv::Point2i where((int)x, (int)y);
+    switch(action){
+        case GLFW_PRESS:
+            summary.mouse_down[button] = std::make_pair(where, button);
+            break;
+        case GLFW_RELEASE:
+            summary.mouse_up[button] = std::make_pair(where, button);
+            break;
+    }
+}
 
-class MakeSummary : public GLXInterface::GLWindow::EventHandler {
-private:
-    GLXInterface::GLWindow::EventSummary& summary;
-public:
-    MakeSummary(GLXInterface::GLWindow::EventSummary& summary_) : summary(summary_) {}
+void GLXInterface::GLWindow::MakeSummary::cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
+    summary.cursor = cv::Point2i(xpos, ypos);
+    summary.cursor_moved = true;
+}
 
-    void on_key_down(GLXInterface::GLWindow&, int key) {	++summary.key_down[key]; }
-    void on_key_up(GLXInterface::GLWindow&, int key) { ++summary.key_up[key]; }
-    void on_mouse_move(GLXInterface::GLWindow&, cv::Point2i where, int) { summary.cursor = where; summary.cursor_moved = true; }
-    void on_mouse_down(GLXInterface::GLWindow&, cv::Point2i where, int state, int button) { summary.mouse_down[button] = std::make_pair(where,state); }
-    void on_mouse_up(GLXInterface::GLWindow&, cv::Point2i where, int state, int button) { summary.mouse_up[button] = std::make_pair(where,state); }
-    void on_event(GLXInterface::GLWindow&, int event) { ++summary.events[event]; }
-};
+void GLXInterface::GLWindow::MakeSummary::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    switch(action){
+        case GLFW_PRESS:
+            ++summary.key_down[key];
+            break;
+        case GLFW_RELEASE:
+            ++summary.key_up[key];
+            break;
+    }
+}
 
 
 void GLXInterface::GLWindow::activate()

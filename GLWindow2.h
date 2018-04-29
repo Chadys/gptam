@@ -44,8 +44,8 @@ enum GUICommand { ccmd_GrabNextFrame,
 			    ccmd_Exit };
 
 
-//class GLWindow2 : public CVD::GLWindow, public CVD::GLWindow::EventHandler
-class GLWindow2 : public GLWindow, public GLWindow::EventHandler
+//class GLWindow2 : public CVD::GLWindow
+class GLWindow2 : public GLWindow
 {
 
 public:
@@ -84,21 +84,22 @@ protected:
   
   
   // User interface menus:
-  std::vector<GLWindowMenu*> mvpGLWindowMenus;
+  static std::vector<GLWindowMenu*> mvpGLWindowMenus;
 
   cv::Size2i mirVideoSize;   // The size of the source video material.
   
 
   // Event handling routines:
-  virtual void on_key_down(GLWindow&, int key);
-  virtual void on_mouse_move(GLWindow& win, cv::Point2i where, int state);
-  virtual void on_mouse_down(GLWindow& win, cv::Point2i where, int state, int button);
-  virtual void on_event(GLWindow& win, int event);
-  cv::Point2i mirLastMousePos;
+  static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+  static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+  static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+  static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+  static void close_callback(GLFWwindow * window);
+  static cv::Point2i mirLastMousePos;
 
   // Storage for map viewer updates:
-  cv::Vec<float, 6> mvMCPoseUpdate;
-  cv::Vec<float, 6> mvLeftPoseUpdate;
+  static cv::Vec<float, 6> mvMCPoseUpdate;
+  static cv::Vec<float, 6> mvLeftPoseUpdate;
   
 
 };

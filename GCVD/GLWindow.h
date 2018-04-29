@@ -45,41 +45,32 @@ namespace GLXInterface {
 
     /// An object that creates a window and a GL context attached to that window, and manages its events.
     class GLWindow {
-   
+
 	public:
 
 	/// Abstract base class for event handlers.  Subclass this and override to implement a handler.
 	class EventHandler {
-	  public:
-	    virtual ~EventHandler() {}
-	    /// Called for key press events
-	    virtual void on_key_down(GLWindow&, int /*key*/) {}
-	    /// Called for key release events
-	    virtual void on_key_up(GLWindow& /*win*/, int /*key*/) {}
-	    /// Called for mouse movement events
-	    virtual void on_mouse_move(GLWindow& /*win*/, cv::Point2i /*where*/, int /*state*/) {}
-	    /// Called for mouse button press events
-	    virtual void on_mouse_down(GLWindow& /*win*/, cv::Point2i /*where*/, int /*state*/, int /*button*/) {}
-	    /// Called for mouse button release events
-	    virtual void on_mouse_up(GLWindow& /*win*/, cv::Point2i /*where*/, int /*state*/, int /*button*/) {}
-	    /// Called for window resize events
-	    virtual void on_resize(GLWindow& /*win*/, cv::Size2i /*size*/) {}
-	    /// Called for general window events (such as EVENT_CLOSE)
-	    virtual void on_event(GLWindow& /*win*/, int /*event*/) {}
+    private:
+        EventHandler(){}
+    public:
+		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods){}
+		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){}
+		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){}
+        static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){}
+        static void close_callback(GLFWwindow *){}
+		static void size_callback(GLFWwindow *, int, int){}
 	};
 
 	/// A summary of multiple events
 	struct EventSummary {
-	    
+
 	    EventSummary() : cursor(-1,-1), cursor_moved(false) {}
 	    /// key->frequency mapping for key presses and releases
 	    std::map<int,int> key_down, key_up;
 	    typedef std::map<int,int>::const_iterator key_iterator;
 	    /// button->frequency mapping for mouse presses and releases
 	    std::map<int,std::pair<cv::Point2i, int> > mouse_down, mouse_up;
-	    typedef std::map<int,std::pair<cv::Point2i,int> >::const_iterator mouse_iterator;
-	    /// Generic window events -> frequency
-	    std::map<int,int> events;
+	    typedef std::map<int,std::pair<cv::Point2i,int>>::const_iterator mouse_iterator;
 	    /// Reset the summary
 	    void clear() { *this = EventSummary(); }
 	    /// last seen cursor position from mouse_move
@@ -88,16 +79,40 @@ namespace GLXInterface {
 	    bool cursor_moved;
 	};
 
+    class MakeSummary {
+    private:
+        MakeSummary(){}
+        static GLXInterface::GLWindow::EventSummary summary;
+    public:
+        static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+        static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+        static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    };
+
 	/// Construct a GLWindow of the given size and colour depth, with the given title.
 	/// A double-buffered GL context is associated with the window.
 	/// @param size    Window size
 	/// @param bpp     Colour depth
 	/// @param title   Window title
-	/// @param display X11 display string, passed to XOpenDisplay. "" Is used to indicate NULL. This is ignored for non X11 platforms. 
-	GLWindow(const cv::Size2i& size, EventHandler& handler = MakeSummary(), int bpp=24, const std::string& title="GLWindow");
+
+	GLWindow(const cv::Size2i& size,
+             GLFWmousebuttonfun mouse_button_callback = MakeSummary::mouse_button_callback,
+             GLFWcursorposfun cursor_position_callback = MakeSummary::cursor_position_callback,
+             GLFWkeyfun key_callback = MakeSummary::key_callback,
+             GLFWscrollfun scroll_callback = EventHandler::scroll_callback,
+             GLFWwindowclosefun close_callback = EventHandler::close_callback,
+             GLFWwindowsizefun size_callback = EventHandler::size_callback,
+             int bpp=24, const std::string& title="GLWindow");
 
 	///@overload
-	GLWindow(const cv::Size2i& size, const std::string& title, EventHandler& handler = MakeSummary(), int bpp=24);
+	GLWindow(const cv::Size2i& size, const std::string& title,
+             GLFWmousebuttonfun mouse_button_callback = MakeSummary::mouse_button_callback,
+             GLFWcursorposfun cursor_position_callback = MakeSummary::cursor_position_callback,
+             GLFWkeyfun key_callback = MakeSummary::key_callback,
+             GLFWscrollfun scroll_callback = EventHandler::scroll_callback,
+             GLFWwindowclosefun close_callback = EventHandler::close_callback,
+             GLFWwindowsizefun size_callback = EventHandler::size_callback,
+             int bpp=24);
 
 	~GLWindow();
 	/// Get the size
@@ -121,7 +136,13 @@ namespace GLXInterface {
 	/// Swap the front and back buffers
 	void swap_buffers();
 	/// register event handlers
-	void set_events(EventHandler& handler);
+	void set_events(
+            GLFWmousebuttonfun mouse_button_callback,
+            GLFWcursorposfun cursor_position_callback,
+            GLFWkeyfun key_callback,
+            GLFWscrollfun scroll_callback,
+            GLFWwindowclosefun close_callback,
+            GLFWwindowsizefun size_callback);
 	/// Handle events in the event queue by calling back to the specified handler.
 	void handle_events();
 	/// Make this GL context active
@@ -130,10 +151,7 @@ namespace GLXInterface {
 	void make_current() { activate(); }
 
 	/// events handler
-	void error_callback(int error, const char* description);
-	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-	static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
-	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void error_callback(int error, const char* description);
     
     struct State {
         std::string title;
@@ -142,12 +160,16 @@ namespace GLXInterface {
 	   
     private:
 	State* state;
-	void init(const cv::Size2i& sz, int bpp, const std::string& title);
+	void init(const cv::Size2i& sz, int bpp, const std::string& title,
+              GLFWmousebuttonfun mouse_button_callback,
+              GLFWcursorposfun cursor_position_callback,
+              GLFWkeyfun key_callback,
+              GLFWscrollfun scroll_callback,
+              GLFWwindowclosefun close_callback,
+              GLFWwindowsizefun size_callback);
     
 	
     };
-
-
 }
 
 

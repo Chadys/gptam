@@ -27,8 +27,9 @@ class GLWindowMenu
   
   void GUICommandHandler(std::string sCommand, std::string sParams);
   static void GUICommandCallBack(void* ptr, std::string sCommand, std::string sParams);
-  
-  bool HandleClick(int button, int state, int x, int y);
+
+  bool HandleScroll(double xoffset, double yoffset, int x, int y);
+  bool HandleClick(int button, int x, int y);
 
   
 

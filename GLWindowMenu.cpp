@@ -247,7 +247,46 @@ void GLWindowMenu::Render(int nTop, int nHeight, int nWidth, GLWindow2 &glw)
 };
 
 
-bool GLWindowMenu::HandleClick(int nMouseButton, int state, int x, int y)
+bool GLWindowMenu::HandleScroll(double xoffset, double yoffset, int x, int y){
+    if(!*mgvnEnabled)
+        return false;
+
+    if((y<mnMenuTop)||(y>mnMenuTop + mnMenuHeight))
+        return false;
+    if(x<mnLeftMostCoord)
+        return false;
+
+    // if no menu displayed, then must display root menu!
+    if(msCurrentSubMenu == "")
+    {
+        msCurrentSubMenu = "Root";
+        return true;
+    };
+
+    // Figure out which button was pressed:
+    int nButtonNumber = (mnWidth - x) / *mgvnMenuItemWidth;
+    if(nButtonNumber > (int)(mmSubMenus[msCurrentSubMenu].mvItems.size()))
+        nButtonNumber = 0;
+
+    if(nButtonNumber==0) // Clicked on menu name .. . go to root.
+    {
+        if(msCurrentSubMenu =="Root")
+            msCurrentSubMenu = "";
+        else
+            msCurrentSubMenu = "Root";
+        return true;
+    };
+
+    MenuItem SelectedItem  = mmSubMenus[msCurrentSubMenu].mvItems[nButtonNumber-1];
+
+    *(SelectedItem.gvnIntValue)+=yoffset;
+    if(*(SelectedItem.gvnIntValue) > SelectedItem.max)
+        *(SelectedItem.gvnIntValue) = SelectedItem.max;
+    if(*(SelectedItem.gvnIntValue) < SelectedItem.min)
+        *(SelectedItem.gvnIntValue) = SelectedItem.min;
+    return true;
+}
+bool GLWindowMenu::HandleClick(int nMouseButton, int x, int y)
 {
   if(!*mgvnEnabled)
     return false;
@@ -280,39 +319,21 @@ bool GLWindowMenu::HandleClick(int nMouseButton, int state, int x, int y)
   
   MenuItem SelectedItem  = mmSubMenus[msCurrentSubMenu].mvItems[nButtonNumber-1];
   msCurrentSubMenu=SelectedItem.sNextMenu;
-  switch(SelectedItem.type)
-    {
+  switch(SelectedItem.type){
     case Button:
-      GUI.ParseLine(SelectedItem.sParam);
-      break;
+        GUI.ParseLine(SelectedItem.sParam);
+        break;
     case Toggle:
-      *(SelectedItem.gvnIntValue)^=1;
-      break;
+        *(SelectedItem.gvnIntValue)^=1;
+        break;
     case Slider:
-      {
-	if(nMouseButton == GLWindow::BUTTON_WHEEL_UP)
-	  {
-	    *(SelectedItem.gvnIntValue)+=1;
-	    if(*(SelectedItem.gvnIntValue) > SelectedItem.max)
-	      *(SelectedItem.gvnIntValue) = SelectedItem.max;
-	  }
-	else if(nMouseButton == GLWindow::BUTTON_WHEEL_DOWN)
-	  {
-	    *(SelectedItem.gvnIntValue)-=1;
-	    if(*(SelectedItem.gvnIntValue) < SelectedItem.min)
-	      *(SelectedItem.gvnIntValue) = SelectedItem.min;
-	  }
-	else
-	  {
-	    int nPos = *mgvnMenuItemWidth - ((mnWidth - x) % *mgvnMenuItemWidth);
-	    double dFrac = (double) nPos / *mgvnMenuItemWidth;
-	    *(SelectedItem.gvnIntValue) = (int)(dFrac * (1.0 + SelectedItem.max - SelectedItem.min)) + SelectedItem.min;
-	  };
-      }
-      break;
+        int nPos = *mgvnMenuItemWidth - ((mnWidth - x) % *mgvnMenuItemWidth);
+        double dFrac = (double) nPos / *mgvnMenuItemWidth;
+        *(SelectedItem.gvnIntValue) = (int)(dFrac * (1.0 + SelectedItem.max - SelectedItem.min)) + SelectedItem.min;
+        break;
     case Monitor:
-      break;
-    };
+        break;
+  };
   return true;
   
 };
