@@ -93,9 +93,10 @@ class Builder:
             rm_one(d)
 
     def get_cmake_cmd(self):
-        cmd = ["cmake",
+        cmd = [self.emscripten_dir+"/emcmake",
+               "cmake",
                "-DCMAKE_BUILD_TYPE=Release",
-               "-DCMAKE_TOOLCHAIN_FILE='%s'" % self.get_toolchain_file(),
+               # "-DCMAKE_TOOLCHAIN_FILE='%s'" % self.get_toolchain_file(),
                "-DCPU_BASELINE=''",
                "-DCPU_DISPATCH=''",
                "-DCV_TRACE=OFF",
@@ -165,7 +166,7 @@ class Builder:
         if flags:
             cmd += ["-DCMAKE_C_FLAGS='%s'" % flags,
                     "-DCMAKE_CXX_FLAGS='%s'" % flags]
-        return cmd;
+        return cmd
 
     def get_build_flags(self):
         flags = ""
@@ -181,13 +182,13 @@ class Builder:
         execute(cmd)
 
     def build_opencvjs(self):
-        execute(["make", "-j", str(multiprocessing.cpu_count()), "opencv.js"])
+        execute([self.emscripten_dir+"/emmake", "make", "-j", str(multiprocessing.cpu_count()), "opencv.js"])
 
     def build_test(self):
-        execute(["make", "-j", str(multiprocessing.cpu_count()), "opencv_js_test"])
+        execute([self.emscripten_dir+"/emmake", "make", "-j", str(multiprocessing.cpu_count()), "opencv_js_test"])
 
     def build_doc(self):
-        execute(["make", "-j", str(multiprocessing.cpu_count()), "doxygen"])
+        execute([self.emscripten_dir+"/emmake", "make", "-j", str(multiprocessing.cpu_count()), "doxygen"])
 
 
 #===================================================================================================
@@ -241,7 +242,7 @@ if __name__ == "__main__":
         builder.config()
 
     if args.config_only:
-        sys.exit(0);
+        sys.exit(0)
 
     log.info("=====")
     log.info("===== Building OpenCV.js in %s", "asm.js" if not args.build_wasm else "wasm")

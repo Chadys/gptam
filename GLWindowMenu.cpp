@@ -320,19 +320,23 @@ bool GLWindowMenu::HandleClick(int nMouseButton, int x, int y)
   MenuItem SelectedItem  = mmSubMenus[msCurrentSubMenu].mvItems[nButtonNumber-1];
   msCurrentSubMenu=SelectedItem.sNextMenu;
   switch(SelectedItem.type){
-    case Button:
+    case Button:{
         GUI.ParseLine(SelectedItem.sParam);
         break;
-    case Toggle:
+    }
+    case Toggle:{
         *(SelectedItem.gvnIntValue)^=1;
         break;
-    case Slider:
+    }
+    case Slider:{
         int nPos = *mgvnMenuItemWidth - ((mnWidth - x) % *mgvnMenuItemWidth);
         double dFrac = (double) nPos / *mgvnMenuItemWidth;
         *(SelectedItem.gvnIntValue) = (int)(dFrac * (1.0 + SelectedItem.max - SelectedItem.min)) + SelectedItem.min;
         break;
-    case Monitor:
+    }
+    case Monitor:{
         break;
+    }
   };
   return true;
   

@@ -12,10 +12,6 @@ RUN mkdir /opt/opencv && cd /opt/opencv\
     && wget 'https://github.com/opencv/opencv/archive/3.4.1.zip' -O opencv-3.4.1.zip \
     && unzip opencv-3.4.1.zip \
     && rm opencv-3.4.1.zip
-COPY ./build_js.py /opt/opencv/opencv-3.4.1/platforms/js/build_js.py
-RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
-        && python /opt/opencv/opencv-3.4.1/platforms/js/build_js.py /opt/opencv/build_js --build_wasm"]
-
 RUN mkdir /opt/readline && cd /opt/readline\
     && wget 'http://ftp.gnu.org/gnu/readline/readline-6.3.tar.gz' -O readline-6.3.tar.gz \
     && tar -xzf readline-6.3.tar.gz \
@@ -28,5 +24,10 @@ RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
         && $EMSCRIPTEN/emconfigure ./configure --disable-shared\
         && $EMSCRIPTEN/emmake make\
         && $EMSCRIPTEN/emmake make install"]
+COPY ./build_js.py /opt/opencv/opencv-3.4.1/platforms/js/build_js.py
+COPY ./enable_components_opencvjs.py /opt/opencv/opencv-3.4.1/enable_components_opencvjs.py
+RUN ["python", "/opt/opencv/opencv-3.4.1/enable_components_opencvjs.py"]
+RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
+        && python /opt/opencv/opencv-3.4.1/platforms/js/build_js.py /opt/opencv/build_js --build_wasm --clean_build_dir"]
 WORKDIR /opt/code/
 EXPOSE 8080
