@@ -18,7 +18,7 @@ with open('/opt/opencv/opencv-3.4.1/modules/js/src/embindgen.py', 'r') as f:
         # enable enums export
         if line.startswith('export_enums'):
             newContent.append('export_enums = True\n')
-            continue
+            break
         newContent.append(line)
     newContent.append(f.read())
 with open('/opt/opencv/opencv-3.4.1/modules/js/src/embindgen.py', 'w') as f:
