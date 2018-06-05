@@ -24,8 +24,7 @@ list( APPEND
 	EXT_INCLUDE_DIRS
 	${OpenCV_INCLUDE_DIRS}
 )
-##remove items not present in OpenCV_DIR/lib
-#list(REMOVE_ITEM OpenCV_LIBS opencv_videoio opencv_features2d opencv_imgcodecs opencv_calib3d opencv_photo opencv_highgui)
+
 list( APPEND
 	EXT_LIBS
 	${OpenCV_LIBS}
@@ -290,7 +289,7 @@ include_directories(${EXT_INCLUDE_DIRS})
 #		      )
 
 ############ DEFINING NECESSARY MACROS (Use_XMMINTRIN=1 for now...) ###############
-set(EMCC_LINKER_FLAGS "-s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1") #-O2 -s USE_PTHREADS=1 PROXY_TO_WORKER
+set(EMCC_LINKER_FLAGS "--emrun -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1") #-O2 -s USE_PTHREADS=1 PROXY_TO_WORKER
 set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${EMCC_LINKER_FLAGS})
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${EMCC_LINKER_FLAGS})
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
@@ -306,7 +305,6 @@ remove_definitions(-WIN32)
 add_executable(maintest maintest.cpp)
 target_link_libraries(maintest ${EXT_LIBS})
 TARGET_COMPILE_OPTIONS(maintest PRIVATE "-D_LINUX -Wall")
-SET_TARGET_PROPERTIES(maintest PROPERTIES LINK_FLAGS "--emrun")
 set_target_properties(maintest
 		PROPERTIES
 		ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"

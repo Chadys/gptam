@@ -28,6 +28,7 @@ COPY ./build_js.py /opt/opencv/opencv-3.4.1/platforms/js/build_js.py
 COPY ./enable_components_opencvjs.py /opt/opencv/opencv-3.4.1/enable_components_opencvjs.py
 RUN ["python", "/opt/opencv/opencv-3.4.1/enable_components_opencvjs.py"]
 RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
-        && python /opt/opencv/opencv-3.4.1/platforms/js/build_js.py /opt/opencv/build_js --build_wasm --clean_build_dir"]
+        && python /opt/opencv/opencv-3.4.1/platforms/js/build_js.py /opt/opencv/build_js --build_wasm --clean_build_dir\
+        || (cat /opt/opencv/build_js/CMakeFiles/CMakeOutput.log && cat /opt/opencv/build_js/CMakeFiles/CMakeError.log && 0)"]
 WORKDIR /opt/code/
 EXPOSE 8080
