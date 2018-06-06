@@ -9,10 +9,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 ######################################
 # The external reference directory (searching) for cmake
-set(EXT_DIR ${CMAKE_SOURCE_DIR}/cmake )
-list( APPEND CMAKE_MODULE_PATH
-  ${EXT_DIR}
-)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 
 ## find openCV
@@ -243,30 +240,27 @@ set(CALIB_PROJ_INCLUDE
 
 
 ## The notorious OpenGL linker flags
-#SET( GL_LINKER_FLAGS "-lglut -lGLU -lGL")
-## More linker flags for the pthread and math (had to look this one up and just copied it)
-#SET( PTHREAD_PROBLEM_LINKER_FLAGS "-lpthread -lm")
+#SET( GL_LINKER_FLAGS "-lglut -lGLU -lGL -lglfw")
+## More linker flags for the pthread and math
+#SET( MISC_LINKER_FLAGS "-lpthread -lm")
 ## And another linker flag for the use of readline.h
 #SET( GNU_READLINE_LINKER_FLAG "-lreadline")
-# Replaced by emscripten options
 
-# declaring external library include directories
-include_directories(${EXT_INCLUDE_DIRS})
 
-# The gcalibrator executable     
-#add_executable(${CALIB_PROJ_NAME}
-#	       ${CALIB_PROJ_SOURCE}
-#	       ${CALIB_PROJ_INCLUDE}
-#              )
-#
-#
-#
-#target_link_libraries(${CALIB_PROJ_NAME}
-#		      ${EXT_LIBS}
-##		      ${GL_LINKER_FLAGS}
-##		      ${PTHREAD_PROBLEM_LINKER_FLAGS}
-##		      ${GNU_READLINE_LINKER_FLAG}
-#		      )
+# The gcalibrator executable
+add_executable(${CALIB_PROJ_NAME}
+	       ${CALIB_PROJ_SOURCE}
+	       ${CALIB_PROJ_INCLUDE}
+              )
+
+target_link_libraries(${CALIB_PROJ_NAME}
+		      ${EXT_LIBS}
+#		      ${GL_LINKER_FLAGS}
+#		      ${GNU_READLINE_LINKER_FLAG}
+#		      ${MISC_LINKER_FLAGS}
+		      )
+
+target_include_directories(${CALIB_PROJ_NAME} PRIVATE "${EXT_INCLUDE_DIRS}")
 
         
 #install(TARGETS ${CALIB_PROJ_NAME} RUNTIME DESTINATION ${CMAKE_SOURCE_DIR})
@@ -274,49 +268,42 @@ include_directories(${EXT_INCLUDE_DIRS})
       
 		      
 # The gptam executable
-#add_executable(${GPTAM_PROJ_NAME}
-#	      ${GPTAM_PROJ_SOURCE}
-#	      ${GPTAM_PROJ_INCLUDE}
-#              )
-#
-#
-#
-#target_link_libraries(${GPTAM_PROJ_NAME}
-#		      ${EXT_LIBS}
-##		      ${GL_LINKER_FLAGS}
-##		      ${PTHREAD_PROBLEM_LINKER_FLAGS}
-##		      ${GNU_READLINE_LINKER_FLAG}
-#		      )
+add_executable(${GPTAM_PROJ_NAME}
+	      ${GPTAM_PROJ_SOURCE}
+	      ${GPTAM_PROJ_INCLUDE}
+              )
+
+target_link_libraries(${GPTAM_PROJ_NAME}
+		      ${EXT_LIBS}
+#		      ${GL_LINKER_FLAGS}
+#		      ${GNU_READLINE_LINKER_FLAG}
+#		      ${MISC_LINKER_FLAGS}
+		      )
+
+target_include_directories(${GPTAM_PROJ_NAME} PRIVATE "${EXT_INCLUDE_DIRS}")
+
 
 ############ DEFINING NECESSARY MACROS (Use_XMMINTRIN=1 for now...) ###############
-set(EMCC_LINKER_FLAGS "--emrun -s WASM=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1") #-O2 -s USE_PTHREADS=1 PROXY_TO_WORKER
-set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${EMCC_LINKER_FLAGS})
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${EMCC_LINKER_FLAGS})
+set(EMCC_LINKER_FLAGS "--emrun -O2 -s WASM=1 -s USE_WEBGL2=1 -s FULL_ES3=1 -s LEGACY_GL_EMULATION=1 -s GL_FFP_ONLY=1 -s USE_GLFW=3 -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1") # -s USE_PTHREADS=1 PROXY_TO_WORKER
+#set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${EMCC_LINKER_FLAGS})
+#set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${EMCC_LINKER_FLAGS})
+set(CMAKE_EXE_LINKER_FLAGS ${EMCC_LINKER_FLAGS})
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
 
-#target_compile_definitions(${GPTAM_PROJ_NAME} PRIVATE USE_XMMINTRIN=0)
+target_compile_definitions(${GPTAM_PROJ_NAME} PRIVATE USE_XMMINTRIN=0)
 remove_definitions(-WIN32)	
 
-#TARGET_COMPILE_OPTIONS(${CALIB_PROJ_NAME} PRIVATE "-D_LINUX -Wall")
-#TARGET_COMPILE_OPTIONS(${GPTAM_PROJ_NAME} PRIVATE "-D_LINUX -Wall")
+TARGET_COMPILE_OPTIONS(${CALIB_PROJ_NAME} PRIVATE "-D_LINUX -Wall")
+TARGET_COMPILE_OPTIONS(${GPTAM_PROJ_NAME} PRIVATE "-D_LINUX -Wall")
 #install(TARGETS ${GPTAM_PROJ_NAME} RUNTIME DESTINATION ${CMAKE_SOURCE_DIR})
 
 
 add_executable(maintest maintest.cpp)
 target_link_libraries(maintest ${EXT_LIBS})
 TARGET_COMPILE_OPTIONS(maintest PRIVATE "-D_LINUX -Wall")
-set_target_properties(maintest
-		PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
-		LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
-		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
-		)
 
-#set_target_properties(${CALIB_PROJ_NAME} ${GPTAM_PROJ_NAME}
-#        PROPERTIES
-#        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
-#        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
-#        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
-#        )
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 
 SET(CMAKE_CACHEFILE_DIR "cmake-build-debug")

@@ -21,6 +21,10 @@ using namespace Persistence;
 #include <GL/gl.h>
 #include <GL/glut.h>
 
+std::vector<GLWindowMenu*> GLWindow2::mvpGLWindowMenus;
+cv::Point2i GLWindow2::mirLastMousePos;
+cv::Vec<float, 6> GLWindow2::mvMCPoseUpdate;
+cv::Vec<float, 6> GLWindow2::mvLeftPoseUpdate;
 
 GLWindow2::GLWindow2(cv::Size2i irSize, string sTitle) : GLWindow(irSize, sTitle, GLWindow2::mouse_button_callback,
                                                                   GLWindow2::cursor_position_callback, GLWindow2::key_callback,
