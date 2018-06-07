@@ -23,9 +23,9 @@ SET(OPENGL_INCLUDE_DIR "${EMSCRIPTEN_ROOT_PATH}/system/include")
 
 # No library to link against for OpenGL, since Emscripten picks it up automatically from library_gl.js,
 # but need to report something, or CMake thinks we failed in the search.
-SET(OPENGL_LIBRARIES "nul")
-SET(OPENGL_gl_LIBRARY "nul")
-SET(OPENGL_glu_LIBRARY "nul")
+SET(OPENGL_LIBRARIES )
+SET(OPENGL_gl_LIBRARY )
+SET(OPENGL_glu_LIBRARY )
 
 mark_as_advanced(
         OPENGL_INCLUDE_DIR

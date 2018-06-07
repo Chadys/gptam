@@ -1,5 +1,5 @@
 #!/bin/bash
 source /opt/emsdk/emsdk_env.sh &&
-emcmake cmake &&
-emmake make -j4 &&
-emrun --no_browser --hostname 0.0.0.0 --port 8080 .
+emcmake cmake -H. -Bcmake-build-debug &&
+emmake make -j4 -C ./cmake-build-debug &&
+emrun --no_browser --hostname 0.0.0.0 --port 8080 --serve_root ./bin .
