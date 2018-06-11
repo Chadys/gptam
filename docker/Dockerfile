@@ -16,8 +16,11 @@ RUN mkdir /opt/readline && cd /opt/readline\
     && wget 'http://ftp.gnu.org/gnu/readline/readline-6.3.tar.gz' -O readline-6.3.tar.gz \
     && tar -xzf readline-6.3.tar.gz \
     && rm readline-6.3.tar.gz
+COPY ./readline-nacl.patch /opt/readline/readline-6.3/readline-nacl.patch
 RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
         && cd /opt/readline/readline-6.3\
+        && git apply readline-nacl.patch\
+        && export bash_cv_wcwidth_broken=no\
         && export bash_cv_signal_vintage=posix\
         && export ac_cv_lib_util_openpty=no\
         && export ac_cv_lib_dir_opendir=no\
