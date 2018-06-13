@@ -24,6 +24,10 @@
 
 #include <unistd.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 using namespace std;
 using namespace Persistence;
 
@@ -91,6 +95,8 @@ void Tracker::Reset()
   while(!mMapMaker.ResetDone())
 #ifndef WIN32
 	  usleep(10);
+#elseifdef __EMSCRIPTEN__
+      emscripten_sleep(10);
 #else
 	  Sleep(1);
 #endif

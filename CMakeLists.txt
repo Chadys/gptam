@@ -284,7 +284,7 @@ set(EMCC_LINKER_FLAGS "--emrun -O2 -s WASM=1 \
                        --preload-file ../calibrator_settings.cfg@/calibrator_settings.cfg \
                        --preload-file ../settings.cfg@/settings.cfg \
                        -s USE_WEBGL2=1 -s FULL_ES3=1 -s LEGACY_GL_EMULATION=1 -s GL_FFP_ONLY=1 -s USE_GLFW=3 \
-                       -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1") # -s USE_PTHREADS=1 PROXY_TO_WORKER
+                       -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1 -s EMTERPRETIFY_ASYNC=1") # -s USE_PTHREADS=1 PROXY_TO_WORKER
 #set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${EMCC_LINKER_FLAGS})
 #set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${EMCC_LINKER_FLAGS})
 set(CMAKE_EXE_LINKER_FLAGS ${EMCC_LINKER_FLAGS})
