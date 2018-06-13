@@ -10,6 +10,9 @@
 
 #include "Persistence/instances.h"
 #include "System.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 using namespace std;
 using namespace Persistence;
@@ -34,7 +37,15 @@ int main(int argc, char** argv)
   try
   {
     System s;
-    s.Run();
+
+#ifdef __EMSCRIPTEN__
+    // void emscripten_set_main_loop(em_callback_func func, System* func_arg, int fps, int simulate_infinite_loop);
+    emscripten_set_main_loop_arg(System::Run, &s, 0, 1); //setting 0 or a negative value as the fps will use the browser’s requestAnimationFrame mechanism to call the main loop function
+#else
+    while(!s.IsDone()) {
+        s.Run();
+    }
+#endif
   }
   catch(cv::Exception e) {
     

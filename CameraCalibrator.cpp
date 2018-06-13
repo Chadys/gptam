@@ -14,6 +14,9 @@
 #include <stdlib.h>
 
 #include "GCVD/GLHelpers.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 
 
@@ -47,8 +50,14 @@ int main()
   try {
     
       CameraCalibrator c;
-      
-      c.Run();
+#ifdef __EMSCRIPTEN__
+      // void emscripten_set_main_loop(em_callback_func func, int fps, int simulate_infinite_loop);
+      emscripten_set_main_loop_arg(CameraCalibrator::Run, &c, 0, 1); //setting 0 or a negative value as the fps will use the browser’s requestAnimationFrame mechanism to call the main loop function
+#else
+      while(!mbDone) {
+          c.Run();
+      }
+#endif
     }
     catch(cv::Exception e)
     {
@@ -107,48 +116,45 @@ CameraCalibrator::CameraCalibrator() : mGLWindow(mVideoSource.getSize(), "Camera
 
 void CameraCalibrator::Run()
 {
-  while(!mbDone) {
-    
-      
       // One color and one BW frame
       cv::Mat imFrameRGB;
       cv::Mat_<uchar> imFrameBW;
-      
+
       // Grab new video frame...
-      mVideoSource.GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB);  
-      
-      
+      mVideoSource.GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB);
+
+
       // Set up openGL. more comments in the following methods in GLWindow.h ...
       mGLWindow.SetupViewport();
       mGLWindow.SetupVideoOrtho();
       mGLWindow.SetupVideoRasterPosAndZoom();
-       
-      
-      // Note here that a "CalibImage" here represents an object that contains ALL the information necessary 
+
+
+      // Note here that a "CalibImage" here represents an object that contains ALL the information necessary
       // for camera parameter optimization (i.e., corner locations arranged in a grid).
-      // Thus, the "mpvnOptimizing" flag - if true - implies that we can run optimization over the camera parameters  
-      if(mvCalibImgs.size() < 1) *mpvnOptimizing = 0; // if no calibration images exist, then set the optimization flag to false; 
-      
+      // Thus, the "mpvnOptimizing" flag - if true - implies that we can run optimization over the camera parameters
+      if(mvCalibImgs.size() < 1) *mpvnOptimizing = 0; // if no calibration images exist, then set the optimization flag to false;
+
       if(!*mpvnOptimizing) {
-	
+
 	  GUI.ParseLine("CalibMenu.ShowMenu Live");
-	  
-    
+
+
 	  // draw the grayscale image on the OpenGL canvas
 	  GLXInterface::glDrawPixelsGRAY(imFrameBW);
-	  //GLXInterface::glDrawPixelsBGR(imFrameRGB); 
+	  //GLXInterface::glDrawPixelsBGR(imFrameRGB);
 
 	  // create a Calibration image
 	  CalibImage c;
-	  // The method "MakeFromImage" does it all: 
+	  // The method "MakeFromImage" does it all:
 	  // a) Detect free lying corners and display them as red dots.
 	  // b) Pick a starting free corner and find its pose (parameters).
 	  // c) detect more corners arranged in a rectangular grid using the above starting corner.
 	  // d) Draw the grid.
-	  // If true, "MakeFromImage" has actually found a number of grid corners connected to each other 
+	  // If true, "MakeFromImage" has actually found a number of grid corners connected to each other
 	  // and therefore can be used to optimize camera parameters.
 	  if(c.MakeFromImage(imFrameBW, imFrameRGB) ) {
-	      // if a frame capture was requested (frame grabbing here means, "REGISTER A GOOD CALIBRATION IMAGE" 
+	      // if a frame capture was requested (frame grabbing here means, "REGISTER A GOOD CALIBRATION IMAGE"
 	      // and NOT raw frame capturing as the name of the variable or the menu caption implies)
 	      if(mbGrabNextFrame)
 		{
@@ -156,40 +162,40 @@ void CameraCalibrator::Run()
 		  mvCalibImgs.push_back(c);
 		 // Now work out an initial impression of camera pose from the calibration image
 		  mvCalibImgs.back().GuessInitialPose(mCamera);
-		  
+
 		  // draw a cool 3D projection grid
  		  mvCalibImgs.back().Draw3DGrid(mCamera, false);
 		  // switch back to waiting for the user to request the capture of a good caibration image
 		  mbGrabNextFrame = false;
-		  
-		  
+
+
 		};
-	    
+
 	    cout << "Image was 'made'"<<endl;
-	    
+
 	   }
-	    
+
       }
       else {
-	  
+
 	   //cout << "Optimizing..."<<endl;
-	
+
 	  OptimizeOneStep();
-      
+
 	  GUI.ParseLine("CalibMenu.ShowMenu Opti");
 	  int nToShow = *mpvnShowImage - 1;
-	  
+
 	  if(nToShow < 0) nToShow = 0;
 	  if(nToShow >= (int) mvCalibImgs.size())  nToShow = mvCalibImgs.size()-1;
-	  
+
 	  *mpvnShowImage = nToShow + 1;
-      
+
 	  GLXInterface::glDrawPixelsGRAY(mvCalibImgs[nToShow].mim);
-	  
+
 	  mvCalibImgs[nToShow].Draw3DGrid(mCamera,true);
 	}
-	
-      
+
+
       ostringstream ost;
       ost << "Camera Calibration: Grabbed " << mvCalibImgs.size() << " images." << endl;
       if(!*mpvnOptimizing)
@@ -205,7 +211,7 @@ void CameraCalibrator::Run()
 	  ost << "Current RMS pixel error is " << mdMeanPixelError << endl;
 	  //ost << "Current camera params are  " << PV3::get_var("Camera.Parameters") << endl;
 	  ost << "Current camera params are  " << *mCamera.mpvvCameraParams << endl;
-	  ost << "(That would be a pixel aspect ratio of " 
+	  ost << "(That would be a pixel aspect ratio of "
 	      <<  mCamera.PixelAspectRatio() << ")" << endl;
 	  ost << "Check fit by looking through the grabbed images." << endl;
 	  ost << "RMS should go below 0.5, typically below 0.3 for a wide lens." << endl;
@@ -216,7 +222,6 @@ void CameraCalibrator::Run()
       mGLWindow.DrawMenus();
       mGLWindow.HandlePendingEvents();
       mGLWindow.swap_buffers();
-    }
 }
 
 void CameraCalibrator::Reset()
@@ -277,10 +282,16 @@ void CameraCalibrator::GUICommandHandler(string sCommand, string sParams)  // Ca
 	  cout <<"  Copy-paste above line to settings.cfg or camera.cfg! " << endl;
 	}
       mbDone = true;
+#ifdef __EMSCRIPTEN__
+      emscripten_cancel_main_loop();
+#endif
     }
   if(sCommand=="exit" || sCommand=="quit")
     {
       mbDone = true;
+#ifdef __EMSCRIPTEN__
+      emscripten_cancel_main_loop();
+#endif
     }
 }
 

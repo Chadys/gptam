@@ -29,6 +29,8 @@ class System
 public:
   System();
   void Run();
+  inline static void Run(void* system) { reinterpret_cast<System*>(system)->Run(); }
+  inline bool IsDone() { return mbDone; }
   
 private:
   VideoSource mVideoSource;

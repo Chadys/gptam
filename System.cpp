@@ -18,6 +18,9 @@
 #include "Tracker.h"
 #include "ARDriver.h"
 #include "MapViewer.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 
 using namespace std;
@@ -74,8 +77,6 @@ System::System() : mGLWindow(mVideoSource.getSize(), "PTAM")
 
 void System::Run()
 {
-  while(!mbDone) {
-      
       // We use two versions of each video frame:
       // One black and white (for processing by the tracker etc)
       // and one RGB, for drawing.
@@ -122,12 +123,16 @@ void System::Run()
       mGLWindow.DrawMenus();
       mGLWindow.swap_buffers();
       mGLWindow.HandlePendingEvents();
-    }
 }
 
 void System::GUICommandCallBack(void *ptr, string sCommand, string sParams)
 {
-  if(sCommand=="quit" || sCommand == "exit") static_cast<System*>(ptr)->mbDone = true;
+  if(sCommand=="quit" || sCommand == "exit") {
+      static_cast<System *>(ptr)->mbDone = true;
+#ifdef __EMSCRIPTEN__
+      emscripten_cancel_main_loop();
+#endif
+  }
 }
 
 

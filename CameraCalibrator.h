@@ -22,7 +22,7 @@ public:
   
   CameraCalibrator();
   void Run();
-  
+  inline static void Run(void* calibrator) { reinterpret_cast<CameraCalibrator*>(calibrator)->Run(); }
   
   
 protected:
