@@ -28,15 +28,13 @@ int main()
   cout << "  Welcome to CameraCalibrator for Visual Tracking and Mapping" << endl;
   cout << "  ----------------------------------------------------------------- " << endl;
 
-  cout << "  A deep code adaptation of the original 'Parallel tracking and Mapping' by Klein and Murray" << endl;
-  cout << "  This code is purely OpenCV based and does not require libCVD, TooN and GVars (although you will need openGL)" << endl;
+  cout << "  A WebAssembly compatible version of GPTAM by George Terzakis which is itself" << endl;
+  cout << "  a deep code adaptation of the original 'Parallel tracking and Mapping' by Klein and Murray" << endl;
+  cout << "  This code is containerized by docker so that the only thing you'll need is Docker, Docker-compose and a browser" << endl;
   cout << " *"<<endl;
-  cout << " For interoperability with OpenCV methods and structures,"<<endl;
-  cout << " Partial functionality of TooN, libCVD and GVars was retained based "<<endl
-    <<"on the latest code by Rosten, Klein and others."<<endl<<endl;
   
-  cout << "  	*		George Terzakis 2016 " <<endl;
-  cout << " 	*	 University of Portsmouth " <<endl;
+  cout << "  	*		Julie Rymer 2018 " <<endl;
+  cout << " 	*	 Université Paris 8 " <<endl;
   cout << endl;  
   cout << "  Parsing calibrator_settings.cfg ...." << endl;
   

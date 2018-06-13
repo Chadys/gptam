@@ -17,10 +17,11 @@ using namespace Persistence;
 int main(int argc, char** argv)
 {
   
-  cout << "  Visual Tracking and Mapping with OpenCV" << endl;
+  cout << "  Visual Tracking and Mapping with OpenCV for WebAssembly" << endl;
   cout << "  --------------- " << endl;
-  cout <<endl<<endl<<" University of Portsmouth 2016";
-  cout << "  Based on PTAM by Klein and Murray (Isis Innovation Limited 2008)" << endl;
+  cout <<endl<<endl<<" Université Paris 8 2018";
+  cout << "  Based on GPTAM by George Terzakis (University of Portsmouth 2016)" << endl;
+  cout << "itself based on PTAM by Klein and Murray (Isis Innovation Limited 2008)" << endl;
   cout << "   " << endl;
   cout << endl;
 

@@ -19,7 +19,7 @@ with open('/opt/opencv/opencv-3.4.1/modules/highgui/test/test_gui.cpp', 'r') as 
             break
         newContent.append(line)
     newContent.append(f.read())
-with open('/opt/opencv/opencv-3.4.1/modules/js/src/embindgen.py', 'w') as f:
+with open('/opt/opencv/opencv-3.4.1/modules/highgui/test/test_gui.cpp', 'w') as f:
     f.writelines(newContent)
 
 newContent = []
@@ -30,14 +30,14 @@ with open('/opt/opencv/opencv-3.4.1/modules/highgui/CMakeLists.txt', 'r') as f:
             break
         if line == 'elseif(HAVE_COCOA)\n':
             # include window_glfw as source for highgui
-            newContent.extends([line, f.readline(), f.readline(),
+            newContent.extend([line, f.readline(), f.readline(),
                                 'elseif(HAVE_GLFW)\n',
                                 ' list(APPEND highgui_srcs ${CMAKE_CURRENT_LIST_DIR}/src/window_glfw.cpp)'
                                 ])
             break
         newContent.append(line)
     newContent.append(f.read())
-with open('/opt/opencv/opencv-3.4.1/modules/js/src/embindgen.py', 'w') as f:
+with open('/opt/opencv/opencv-3.4.1/modules/highgui/CMakeLists.txt', 'w') as f:
     f.writelines(newContent)
 
 
@@ -46,5 +46,5 @@ with open('/opt/opencv/opencv-3.4.1/cmake/templates/cvconfig.h.in', 'r') as f:
     for line in f:
         newContent.append(line)
 newContent.insert(-1, '#cmakedefine HAVE_GLFW\n')
-with open('/opt/opencv/opencv-3.4.1/modules/js/src/embindgen.py', 'w') as f:
+with open('/opt/opencv/opencv-3.4.1/cmake/templates/cvconfig.h.in', 'w') as f:
     f.writelines(newContent)

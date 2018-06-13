@@ -30,10 +30,10 @@ RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
 COPY ./build_js.py /opt/opencv/opencv-3.4.1/platforms/js/build_js.py
 COPY ./enable_components_opencvjs.py /opt/opencv/opencv-3.4.1/enable_components_opencvjs.py
 RUN ["python", "/opt/opencv/opencv-3.4.1/enable_components_opencvjs.py"]
-COPY ./enable_glfw_windowing_system.py /opt/opencv/opencv-3.4.1/enable_glfw_windowing_system.py
-RUN ["python", "/opt/opencv/opencv-3.4.1/enable_glfw_windowing_system.py"]
-COPY ./window.cpp /opt/opencv/opencv-3.4.1/modules/highgui/src/window.cpp
-COPY ./window_glfw.cpp /opt/opencv/opencv-3.4.1/modules/highgui/src/window_glfw.cpp
+#COPY ./enable_glfw_windowing_system.py /opt/opencv/opencv-3.4.1/enable_glfw_windowing_system.py
+#RUN ["python", "/opt/opencv/opencv-3.4.1/enable_glfw_windowing_system.py"]
+#COPY ./window.cpp /opt/opencv/opencv-3.4.1/modules/highgui/src/window.cpp
+#COPY ./window_glfw.cpp /opt/opencv/opencv-3.4.1/modules/highgui/src/window_glfw.cpp
 RUN ["/bin/bash", "-c", "source /opt/emsdk/emsdk_env.sh\
         && python /opt/opencv/opencv-3.4.1/platforms/js/build_js.py /opt/opencv/build_js --build_wasm --clean_build_dir\
         || (cat /opt/opencv/build_js/CMakeFiles/CMakeOutput.log && cat /opt/opencv/build_js/CMakeFiles/CMakeError.log && 0)"]

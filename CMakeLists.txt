@@ -279,10 +279,10 @@ target_link_libraries(${GPTAM_PROJ_NAME}
 
 target_include_directories(${GPTAM_PROJ_NAME} PRIVATE "${EXT_INCLUDE_DIRS}")
 
-
 ############ DEFINING NECESSARY MACROS (Use_XMMINTRIN=1 for now...) ###############
-configure_file(${CMAKE_SOURCE_DIR}/calibrator_settings.cfg calibrator_settings.cfg COPYONLY) # because preload file can only access file under current working directory that'll serve as virtual filesystem root
-set(EMCC_LINKER_FLAGS "--emrun -O2 --preload-file calibrator_settings.cfg -s WASM=1 \
+set(EMCC_LINKER_FLAGS "--emrun -O2 -s WASM=1 \
+                       --preload-file ../calibrator_settings.cfg@/calibrator_settings.cfg \
+                       --preload-file ../settings.cfg@/settings.cfg \
                        -s USE_WEBGL2=1 -s FULL_ES3=1 -s LEGACY_GL_EMULATION=1 -s GL_FFP_ONLY=1 -s USE_GLFW=3 \
                        -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1") # -s USE_PTHREADS=1 PROXY_TO_WORKER
 #set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${EMCC_LINKER_FLAGS})
